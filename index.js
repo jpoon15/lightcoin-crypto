@@ -35,7 +35,6 @@ to get balance, what to focus on value. Can't use for ... in, must use for ... o
 
 
 
-
 class Transaction {
   constructor(amount, account) {
     this.amount = amount;
@@ -43,22 +42,39 @@ class Transaction {
   }
   //action that deducts from account balance
   commit() {
-    this.time = new Date();
-    this.account.addTransaction(this);
+    if (!this.isAllowed()) {
+      console.log("================")
+      console.log("Action Rejected!")
+      console.log("================")
+      return false
+    }
+      console.log("================")
+      console.log("Action Accepted!")
+      console.log("================")
+      this.time = new Date();
+      this.account.addTransaction(this);
+      return true;
   }
 }
-
 
 
 class Withdrawal extends Transaction {
   get value() {
     return -this.amount;
   }
+
+  isAllowed() {
+    return (this.account.balance - this.amount >= 0)
+  }
 }
 
 class Deposit extends Transaction {
   get value() {
     return this.amount;
+  }
+
+  isAllowed() {
+    return true;
   }
 }
 
@@ -67,22 +83,27 @@ class Deposit extends Transaction {
 // We use the code below to "drive" the application logic above and make sure it's working as expected
 
 const myAccount = new Account("snow-patrol");
+console.log("================")
+console.log("myAccount Summary:", myAccount)
 
-console.log("myAccount:", myAccount)
+console.log("Going to Withdrawal")
 t1 = new Withdrawal(50.25, myAccount);
-t1.commit();
+t1.commit(); //Returns Rejected
 console.log("t1 Summary:", t1)
 console.log("myAccount:", myAccount)
 console.log('New Balance after T1:', myAccount.balance);
 
+
+console.log("Going to Withdrawal")
 t2 = new Withdrawal(9.99, myAccount);
-t2.commit();
+t2.commit(); // Returns Rejected
 console.log("t2 Summary:", t2)
 console.log("myAccount:", myAccount)
 console.log('New Balance after T2:', myAccount.balance);
 
+console.log("Going to Deposit")
 t3 = new Deposit(120.00, myAccount);
-t3.commit();
+t3.commit(); //
 console.log("t3 Summary:", t3)
 console.log("myAccount:", myAccount)
 console.log('New Balance after T3:', myAccount.balance);
